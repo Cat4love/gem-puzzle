@@ -51,22 +51,22 @@ const wraper = document.createElement('div');
 wraper.className = 'game__wraper';
 game.append(wraper);
 
+let amount = 4;
 
 start.addEventListener("click",()=>{
 	wraper.firstChild.remove()
-	newGame();
+	newGame(amount);
 	count = 0;
 	counter.innerHTML = `Moves: ${count}`;
 })
 
 
-
-function newGame() {
+function newGame(amount) {
   const field = document.createElement('div');
   field.className = 'game__field';
   wraper.append(field);
 
-  const numbers = Array.from(new Array(15).keys()).sort(
+  const numbers = Array.from(new Array((amount ** 2) - 1).keys()).sort(
     () => Math.random() - 0.5
   )
 
@@ -80,17 +80,19 @@ function newGame() {
 
   cells.push(empty);
 
-  for (let i = 1; i <= 15; i++) {
+  for (let i = 1; i <= (amount ** 2) - 1; i++) {
     const cell = document.createElement('div');
     cell.className = 'game__cell';
+    cell.style.width = `${320 / amount}px`
+    cell.style.height = `${320 / amount}px`
     cell.innerHTML = numbers[i - 1] + 1;
 
-    const left = i % 4;
-    const top = (i - left) / 4;
+    const left = i % amount;
+    const top = (i - left) / amount;
     const value = numbers[i - 1] + 1;
 
-    cell.style.left = `${left * 100}px`;
-    cell.style.top = `${top * 100}px`;
+    cell.style.left = `${left * (320 / amount)}px`;
+    cell.style.top = `${top * (320 / amount)}px`;
 
     cells.push({
       value: value,
@@ -112,8 +114,8 @@ function newGame() {
     if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 1) {
       return;
     } else {
-      cell.element.style.left = `${empty.left * 100}px`;
-      cell.element.style.top = `${empty.top * 100}px`;
+      cell.element.style.left = `${empty.left * (320 / amount)}px`;
+      cell.element.style.top = `${empty.top * (320 / amount)}px`;
 
       const emptyleft = empty.left;
       const emptyTop = empty.top;
@@ -145,7 +147,7 @@ function newGame() {
 }
 
 
-newGame();
+newGame(amount);
 
 const footer = document.createElement('div');
 footer.className = 'game__footer';
@@ -168,10 +170,19 @@ for(let i = 0; i < 6; i++){
 	option.className = 'game__option'
 	option.innerHTML = fieldSize[i][0]
 	option.value = fieldSize[i][1]
+  if (i === 1){
+    option.selected = true;
+  }
 	select.append(option)
 }
 
-
+select.addEventListener('change',()=>{
+  amount = select.value;
+  wraper.firstChild.remove()
+	newGame(amount);
+	count = 0;
+	counter.innerHTML = `Moves: ${count}`;
+})
 
 
 
