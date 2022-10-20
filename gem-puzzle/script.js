@@ -1,37 +1,41 @@
+const container = document.createElement('div');
+container.className = 'container';
+document.body.append(container);
+
 const game = document.createElement('div');
 game.className = 'game';
-document.body.append(game);
+container.append(game);
 
 const header = document.createElement('div');
 header.className = 'game__header';
 game.append(header);
 
 const buttons = document.createElement('div');
-buttons.className = 'game__butons';
+buttons.className = 'game__buttons';
 header.append(buttons);
 
 const start = document.createElement('button');
-start.className = 'game__buton';
-start.innerHTML = 'Shuffle and start';
+start.className = 'game__button';
+start.innerHTML = 'Shuffle';
 buttons.append(start);
 
 const save = document.createElement('button');
-save.className = 'game__buton';
+save.className = 'game__button';
 save.innerHTML = 'Save';
 buttons.append(save);
 
 const load = document.createElement('button');
-load.className = 'game__buton';
+load.className = 'game__button';
 load.innerHTML = 'Load';
 buttons.append(load);
 
 const results = document.createElement('button');
-results.className = 'game__buton';
+results.className = 'game__button';
 results.innerHTML = 'Results';
 buttons.append(results);
 
 const sound = document.createElement('button');
-sound.className = 'game__buton';
+sound.className = 'game__button';
 sound.innerHTML = 'Sound';
 buttons.append(sound);
 let soundFlag = true;
@@ -46,7 +50,7 @@ let count = 0;
 counter.innerHTML = `Moves: ${count}`;
 info.append(counter);
 
-const timer = document.createElement('span');
+const timer = document.createElement('p');
 timer.className = 'game__timer';
 info.append(timer);
 
@@ -69,11 +73,16 @@ function stopTimer() {
 }
 
 
+let gameSize = 320;
+
+
 const wraper = document.createElement('div');
 wraper.className = 'game__wraper';
 game.append(wraper);
 
 let amount = 4;
+
+
 
 start.addEventListener('click', () => {
   wraper.firstChild.remove();
@@ -113,8 +122,8 @@ function newGame(amount, saveCells = null, timer = 0) {
   for (let i = 1; i <= amount ** 2 - 1; i++) {
     const cell = document.createElement('div');
     cell.className = 'game__cell';
-    cell.style.width = `${320 / amount}px`;
-    cell.style.height = `${320 / amount}px`;
+    cell.style.width = `${gameSize / amount}px`;
+    cell.style.height = `${gameSize / amount}px`;
     let left = 0;
     let top = 0;
     let value = 0;
@@ -123,15 +132,15 @@ function newGame(amount, saveCells = null, timer = 0) {
       top = (i - left) / amount;
       cell.innerHTML = numbers[i - 1] + 1;
       value = numbers[i - 1] + 1;
-      cell.style.left = `${left * (320 / amount)}px`;
-      cell.style.top = `${top * (320 / amount)}px`;
+      cell.style.left = `${left * (gameSize / amount)}px`;
+      cell.style.top = `${top * (gameSize / amount)}px`;
     } else {
       left = saveCells[i].left
       top = saveCells[i].top
       cell.innerHTML = saveCells[i].value
       value = saveCells[i].value
-      cell.style.left = `${left * (320 / amount)}px`;
-      cell.style.top = `${top * (320 / amount)}px`;
+      cell.style.left = `${left * (gameSize / amount)}px`;
+      cell.style.top = `${top * (gameSize / amount)}px`;
     }
   
     cells.push({
@@ -158,8 +167,8 @@ function newGame(amount, saveCells = null, timer = 0) {
     if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 1) {
       return;
     } else {
-      cell.element.style.left = `${empty.left * (320 / amount)}px`;
-      cell.element.style.top = `${empty.top * (320 / amount)}px`;
+      cell.element.style.left = `${empty.left * (gameSize / amount)}px`;
+      cell.element.style.top = `${empty.top * (gameSize / amount)}px`;
 
       const emptyleft = empty.left;
       const emptyTop = empty.top;
