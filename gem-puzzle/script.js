@@ -15,15 +15,15 @@ start.className = 'game__buton';
 start.innerHTML = 'Shuffle and start';
 buttons.append(start);
 
-const pause = document.createElement('button');
-pause.className = 'game__buton';
-pause.innerHTML = 'Stop';
-buttons.append(pause);
-
 const save = document.createElement('button');
 save.className = 'game__buton';
 save.innerHTML = 'Save';
 buttons.append(save);
+
+const load = document.createElement('button');
+load.className = 'game__buton';
+load.innerHTML = 'Load';
+buttons.append(load);
 
 const results = document.createElement('button');
 results.className = 'game__buton';
@@ -34,7 +34,7 @@ const info = document.createElement('div');
 info.className = 'game__info';
 header.append(info);
 
-const counter = document.createElement('p');
+let counter = document.createElement('p');
 counter.className = 'game__counter';
 let count = 0;
 counter.innerHTML = `Moves: ${count}`;
@@ -44,29 +44,23 @@ const timer = document.createElement('span');
 timer.className = 'game__timer';
 info.append(timer);
 
-let t = 0;
+let time = 0;
 let timerInterval;
 function startTimer() {
-  stopTimer()
-  timerInterval = setInterval(function() {
-    t += 1/60;
-    secondVal = Math.floor(t) - Math.floor(t/60) * 60;
-    minuteVal = Math.floor(t/60);
-    timer.innerHTML = `Time: ${minuteVal < 10 ? "0" + minuteVal.toString() : minuteVal}:${secondVal < 10 ? "0" + secondVal.toString() : secondVal}`
-  }, 1000/60);
+  stopTimer();
+  timerInterval = setInterval(function () {
+    time += 1 / 60;
+    secondVal = Math.floor(time) - Math.floor(time / 60) * 60;
+    minuteVal = Math.floor(time / 60);
+    timer.innerHTML = `Time: ${
+      minuteVal < 10 ? '0' + minuteVal.toString() : minuteVal
+    }:${secondVal < 10 ? '0' + secondVal.toString() : secondVal}`;
+  }, 1000 / 60);
 }
 
 function stopTimer() {
   clearInterval(timerInterval);
 }
-
-
-pause.addEventListener('click',()=>{
-  stopTimer();
-})
-
-
-
 
 
 const wraper = document.createElement('div');
@@ -75,56 +69,71 @@ game.append(wraper);
 
 let amount = 4;
 
-start.addEventListener("click",()=>{
-	wraper.firstChild.remove()
-	newGame(amount);
-	count = 0;
-	counter.innerHTML = `Moves: ${count}`;
-})
+start.addEventListener('click', () => {
+  wraper.firstChild.remove();
+  newGame(amount);
+  count = 0;
+  counter.innerHTML = `Moves: ${count}`;
+});
 
+let cells = [];
 
-function newGame(amount) {
-  t = 0;
-  startTimer()
+function newGame(amount, saveCells = null, timer = 0) {
+  time = timer;
+  startTimer();
   const field = document.createElement('div');
   field.className = 'game__field';
   wraper.append(field);
 
-  const numbers = Array.from(new Array((amount ** 2) - 1).keys()).sort(
+  const numbers = Array.from(new Array(amount ** 2 - 1).keys()).sort(
     () => Math.random() - 0.5
-  )
+  );
+  cells = [];
+  
+  let empty = {};
 
-  const cells = [];
-
-  const empty = {
-    top: 0,
-    left: 0,
-    value: 0,
-  };
+  if (saveCells == null){
+    empty.top = 0,
+    empty.left = 0,
+    empty.value = 0
+  } else {
+    empty.top = saveCells[0].top,
+    empty.left = saveCells[0].left,
+    empty.value = saveCells[0].value
+  }
 
   cells.push(empty);
 
-  for (let i = 1; i <= (amount ** 2) - 1; i++) {
+  for (let i = 1; i <= amount ** 2 - 1; i++) {
     const cell = document.createElement('div');
     cell.className = 'game__cell';
-    cell.style.width = `${320 / amount}px`
-    cell.style.height = `${320 / amount}px`
-    cell.innerHTML = numbers[i - 1] + 1;
-
-    const left = i % amount;
-    const top = (i - left) / amount;
-    const value = numbers[i - 1] + 1;
-
-    cell.style.left = `${left * (320 / amount)}px`;
-    cell.style.top = `${top * (320 / amount)}px`;
-
+    cell.style.width = `${320 / amount}px`;
+    cell.style.height = `${320 / amount}px`;
+    let left = 0;
+    let top = 0;
+    let value = 0;
+    if (saveCells == null){
+      left = i % amount;
+      top = (i - left) / amount;
+      cell.innerHTML = numbers[i - 1] + 1;
+      value = numbers[i - 1] + 1;
+      cell.style.left = `${left * (320 / amount)}px`;
+      cell.style.top = `${top * (320 / amount)}px`;
+    } else {
+      left = saveCells[i].left
+      top = saveCells[i].top
+      cell.innerHTML = saveCells[i].value
+      value = saveCells[i].value
+      cell.style.left = `${left * (320 / amount)}px`;
+      cell.style.top = `${top * (320 / amount)}px`;
+    }
+  
     cells.push({
       value: value,
       left: left,
       top: top,
       element: cell,
     });
-
     field.append(cell);
 
     cell.addEventListener('click', () => {
@@ -133,7 +142,7 @@ function newGame(amount) {
   }
 
   function move(index) {
-    startTimer()
+    startTimer();
     const cell = cells[index];
 
     if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 1) {
@@ -157,8 +166,8 @@ function newGame(amount) {
 
     function test() {
       let flag = true;
-      for (let i = 1; i <= 15; i++) {
-        if (cells[i].value !== cells[i].top * 4 + cells[i].left + 1) {
+      for (let i = 1; i <= (amount ** 2) - 1; i++) {
+        if (cells[i].value !== cells[i].top * amount + cells[i].left + 1) {
           flag = false;
         }
       }
@@ -171,45 +180,85 @@ function newGame(amount) {
   }
 }
 
-
-newGame(amount);
-
 const footer = document.createElement('div');
 footer.className = 'game__footer';
 game.append(footer);
 
 const label = document.createElement('label');
 label.className = 'game__label';
-label.innerText = 'Frame size:'
+label.innerText = 'Frame size:';
 footer.append(label);
 
+const select = document.createElement('select');
+select.className = 'game__select';
+footer.append(select);
 
-const select = document.createElement('select')
-select.className = 'game__select'
-footer.append(select)
-
-
-for(let i = 0; i < 6; i++){
-	let fieldSize = [['3x3',3],['4x4',4],['5x5',5],['6x6',6],['7x7',7],['8x8',8]];
-	const option = document.createElement('option')
-	option.className = 'game__option'
-	option.innerHTML = fieldSize[i][0]
-	option.value = fieldSize[i][1]
-  if (i === 1){
+for (let i = 0; i < 6; i++) {
+  let fieldSize = [
+    ['3x3', 3],
+    ['4x4', 4],
+    ['5x5', 5],
+    ['6x6', 6],
+    ['7x7', 7],
+    ['8x8', 8],
+  ];
+  const option = document.createElement('option');
+  option.className = 'game__option';
+  option.innerHTML = fieldSize[i][0];
+  option.value = fieldSize[i][1];
+  if (i === 1) {
     option.selected = true;
   }
-	select.append(option)
+  select.append(option);
 }
 
-select.addEventListener('change',()=>{
+newGame(amount);
+
+select.addEventListener('change', () => {
   amount = select.value;
-  wraper.firstChild.remove()
-	newGame(amount);
-	count = 0;
-	counter.innerHTML = `Moves: ${count}`;
+  wraper.firstChild.remove();
+  newGame(amount, null);
+  count = 0;
+  counter.innerHTML = `Moves: ${count}`;
+});
+
+function saveGame(){
+  localStorage.clear()
+  localStorage.setItem('flag', null)
+  for (let i = 0; i < cells.length; i++){
+    localStorage.setItem(i, JSON.stringify(cells[i]))
+  }
+  localStorage.setItem('amount', amount)
+  localStorage.setItem('count', count)
+  localStorage.setItem('timer', time)
+}
+
+function loadGame(){
+  amount = Number(localStorage.getItem('amount'))
+  let saveCells = []
+    for (let i = 0; i < amount ** 2; i++){
+      saveCells.push(JSON.parse(localStorage.getItem(i)))
+  }
+  saveTimer = Number(localStorage.getItem('timer'))
+  count = Number(localStorage.getItem('count'));
+  counter.innerHTML = `Moves: ${count}`;
+  for (let i = 0; i < 6; i++) {
+    if(amount == select.childNodes[i].value){
+      select.childNodes[i].selected = true;
+    }
+  }
+  if (wraper.childNodes.length !== 0){
+    wraper.firstChild.remove();
+  }
+  newGame(amount, saveCells, saveTimer)
+}
+
+save.addEventListener('click', ()=>{
+  saveGame()
 })
 
-
-
+load.addEventListener('click', ()=>{
+  loadGame()
+})
 
 
