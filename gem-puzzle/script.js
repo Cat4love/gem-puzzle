@@ -40,11 +40,33 @@ let count = 0;
 counter.innerHTML = `Moves: ${count}`;
 info.append(counter);
 
-const timer = document.createElement('p');
-let time = '00:00';
-timer.innerHTML = `Time: ${time}`;
+const timer = document.createElement('span');
 timer.className = 'game__timer';
 info.append(timer);
+
+let t = 0;
+let timerInterval;
+function startTimer() {
+  stopTimer()
+  timerInterval = setInterval(function() {
+    t += 1/60;
+    secondVal = Math.floor(t) - Math.floor(t/60) * 60;
+    minuteVal = Math.floor(t/60);
+    timer.innerHTML = `Time: ${minuteVal < 10 ? "0" + minuteVal.toString() : minuteVal}:${secondVal < 10 ? "0" + secondVal.toString() : secondVal}`
+  }, 1000/60);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
+
+pause.addEventListener('click',()=>{
+  stopTimer();
+})
+
+
+
 
 
 const wraper = document.createElement('div');
@@ -62,6 +84,8 @@ start.addEventListener("click",()=>{
 
 
 function newGame(amount) {
+  t = 0;
+  startTimer()
   const field = document.createElement('div');
   field.className = 'game__field';
   wraper.append(field);
@@ -109,6 +133,7 @@ function newGame(amount) {
   }
 
   function move(index) {
+    startTimer()
     const cell = cells[index];
 
     if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 1) {
