@@ -28,7 +28,9 @@
 
 
 
-
+.sound__off{
+  text-decoration: line-through;
+}
 
 
 

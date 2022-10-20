@@ -30,6 +30,12 @@ results.className = 'game__buton';
 results.innerHTML = 'Results';
 buttons.append(results);
 
+const sound = document.createElement('button');
+sound.className = 'game__buton';
+sound.innerHTML = 'Sound';
+buttons.append(sound);
+let soundFlag = true;
+
 const info = document.createElement('div');
 info.className = 'game__info';
 header.append(info);
@@ -142,6 +148,10 @@ function newGame(amount, saveCells = null, timer = 0) {
   }
 
   function move(index) {
+    if(soundFlag){
+      getSound();
+    }
+    
     startTimer();
     const cell = cells[index];
 
@@ -262,3 +272,20 @@ load.addEventListener('click', ()=>{
 })
 
 
+
+function getSound() {
+  let audio = new Audio(); 
+  audio.src = './assets/audio/stone_touch_effect.mp3'; 
+  audio.autoplay = true; 
+}
+
+
+sound.addEventListener('click', ()=>{
+  if(soundFlag){
+    soundFlag = false;
+  } else {
+    soundFlag = true;
+  }
+
+  sound.classList.toggle('sound__off')
+})
