@@ -133,10 +133,50 @@ function newGame(amount, saveCells = null, saveTime = 0) {
   field.className = 'game__field';
   wraper.append(field);
 
-  const numbers = Array.from(new Array(amount ** 2 - 1).keys()).sort(
-    () => Math.random() - 0.5
-  );
+  function generateDigits() {
+    return Array.from(new Array(amount ** 2 - 1).keys()).sort(
+      () => Math.random() - 0.5
+    );
+  }
 
+  function testNumbers(numbers) {
+    let testArray = numbers;
+    let count = 0;
+    for (let i = amount ** 2 - 1; i >= 1; i--) {
+      testArray = testArray.slice(0, i);
+      for (let j = amount ** 2 - 1; j >= 1; j--) {
+        if (testArray[i - 1] + 1 < testArray[j - 1] + 1) {
+          count += 1;
+        }
+      }
+    }
+    if (amount % 2 !== 0 && count % 2 === 0){
+      return true;
+    } else if (amount % 2 === 0 && count % 2 !== 0){
+      return true;
+    } else {
+      return false
+    }
+  }
+
+  function getNumbers() {
+    let numbers; 
+    numbers = generateDigits()
+    if (testNumbers(numbers)) {
+      console.log(true)
+      trueNumbers = numbers
+    } else {
+      console.log(false)
+      getNumbers();
+    }
+    return trueNumbers;
+  }
+
+
+
+  
+
+  const numbers = getNumbers();
   cells = [];
 
   let empty = {};
@@ -212,7 +252,6 @@ function newGame(amount, saveCells = null, saveTime = 0) {
   }
 
   function dragEnd(event) {
-    event.preventDefault();
     startTimer();
 
     if (soundFlag) {
@@ -224,6 +263,7 @@ function newGame(amount, saveCells = null, saveTime = 0) {
         cell = cells[i];
       }
     }
+
     if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 1) {
       return;
     } else {
