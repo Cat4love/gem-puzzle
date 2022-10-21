@@ -70,7 +70,7 @@ info.append(counter);
 
 const timer = document.createElement('p');
 timer.className = 'game__timer';
-timer.innerHTML = 'Time: 00:00'
+timer.innerHTML = 'Time: 00:00';
 info.append(timer);
 
 let time = 0;
@@ -114,11 +114,11 @@ start.addEventListener('click', () => {
 let cells = [];
 
 function newGame(amount, saveCells = null, saveTime = 0) {
-  stopTimer()
+  stopTimer();
 
   time = saveTime;
 
-  if(saveTime === 0){
+  if (saveTime === 0) {
     timer.innerHTML = 'Time: 00:00';
   } else {
     secondVal = Math.floor(time) - Math.floor(time / 60) * 60;
@@ -137,7 +137,8 @@ function newGame(amount, saveCells = null, saveTime = 0) {
     () => Math.random() - 0.5
   );
   cells = [];
-
+  
+  
   let empty = {};
 
   if (saveCells == null) {
@@ -145,7 +146,7 @@ function newGame(amount, saveCells = null, saveTime = 0) {
   } else {
     (empty.top = saveCells[0].top),
       (empty.left = saveCells[0].left),
-      (empty.value = saveCells[0].value);
+      (empty.value = 0);
   }
 
   cells.push(empty);
@@ -155,6 +156,7 @@ function newGame(amount, saveCells = null, saveTime = 0) {
     cell.className = 'game__cell';
     cell.style.width = `${gameSize / amount}px`;
     cell.style.height = `${gameSize / amount}px`;
+    cell.draggable = true;
     let left = 0;
     let top = 0;
     let value = 0;
@@ -185,20 +187,53 @@ function newGame(amount, saveCells = null, saveTime = 0) {
     cell.addEventListener('click', () => {
       move(i);
     });
+
+    // cell.addEventListener('dragstart', dragStart);
+
+    cell.addEventListener('dragend', dragEnd);
   }
 
+  // function dragStart(e) {
+  // }
+
+  function dragEnd(event) {
+    for (let i = 0; i < cells.length; i++) {
+      if (cells[i].value === Number(event.target.innerText)) {
+        cell = cells[i];
+      }
+    }
+    if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 1) {
+      return;
+    } else {
+      cell.element.style.left = `${empty.left * (gameSize / amount)}px`;
+      cell.element.style.top = `${empty.top * (gameSize / amount)}px`;
+
+      const emptyleft = empty.left;
+      const emptyTop = empty.top;
+
+      empty.left = cell.left;
+      empty.top = cell.top;
+
+      cell.left = emptyleft;
+      cell.top = emptyTop;
+    }
+    console.log(cells)
+  }
+
+  field.addEventListener('dragover', (event) => {
+    event.preventDefault();
+  });
+
   function move(index) {
-
     startTimer();
-
     if (soundFlag) {
       getSound();
     }
-
     startTimer();
-    const cell = cells[index];
 
-    if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 4) {
+    cell = cells[index];
+
+    if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 10) {
       return;
     } else {
       cell.element.style.left = `${empty.left * (gameSize / amount)}px`;
@@ -265,9 +300,8 @@ function newGame(amount, saveCells = null, saveTime = 0) {
       newGame(amount, null);
 
       count = 0;
-      
-      counter.innerHTML = `Moves: ${count}`;
 
+      counter.innerHTML = `Moves: ${count}`;
     }
   }
 }
