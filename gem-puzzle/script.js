@@ -136,9 +136,9 @@ function newGame(amount, saveCells = null, saveTime = 0) {
   const numbers = Array.from(new Array(amount ** 2 - 1).keys()).sort(
     () => Math.random() - 0.5
   );
+
   cells = [];
-  
-  
+
   let empty = {};
 
   if (saveCells == null) {
@@ -156,7 +156,6 @@ function newGame(amount, saveCells = null, saveTime = 0) {
     cell.className = 'game__cell';
     cell.style.width = `${gameSize / amount}px`;
     cell.style.height = `${gameSize / amount}px`;
-    cell.draggable = true;
     let left = 0;
     let top = 0;
     let value = 0;
@@ -188,15 +187,38 @@ function newGame(amount, saveCells = null, saveTime = 0) {
       move(i);
     });
 
-    // cell.addEventListener('dragstart', dragStart);
+    cell.addEventListener('dragstart', dragStart);
 
     cell.addEventListener('dragend', dragEnd);
   }
 
-  // function dragStart(e) {
-  // }
+  function dragStart(event) {
+    activeCells();
+  }
+
+  function activeCells() {
+    for (let i = 1; i < cells.length; i++) {
+      cells[i].element.draggable = false;
+      cells[i].element.classList.remove('game__cell-active');
+      if (
+        Math.abs(empty.left - cells[i].left) +
+          Math.abs(empty.top - cells[i].top) ===
+        1
+      ) {
+        cells[i].element.draggable = true;
+        cells[i].element.classList.add('game__cell-active');
+      }
+    }
+  }
 
   function dragEnd(event) {
+    event.preventDefault();
+    startTimer();
+
+    if (soundFlag) {
+      getSound();
+    }
+
     for (let i = 0; i < cells.length; i++) {
       if (cells[i].value === Number(event.target.innerText)) {
         cell = cells[i];
@@ -217,11 +239,14 @@ function newGame(amount, saveCells = null, saveTime = 0) {
       cell.left = emptyleft;
       cell.top = emptyTop;
     }
-    console.log(cells)
+
+    activeCells();
   }
 
   field.addEventListener('dragover', (event) => {
-    event.preventDefault();
+    if (event.target.className === 'game__field') {
+      event.preventDefault();
+    }
   });
 
   function move(index) {
@@ -229,11 +254,10 @@ function newGame(amount, saveCells = null, saveTime = 0) {
     if (soundFlag) {
       getSound();
     }
-    startTimer();
 
     cell = cells[index];
 
-    if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 10) {
+    if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 1) {
       return;
     } else {
       cell.element.style.left = `${empty.left * (gameSize / amount)}px`;
@@ -248,7 +272,7 @@ function newGame(amount, saveCells = null, saveTime = 0) {
       cell.left = emptyleft;
       cell.top = emptyTop;
     }
-
+    activeCells();
     count += 1;
     counter.innerHTML = `Moves: ${count}`;
 
@@ -304,6 +328,7 @@ function newGame(amount, saveCells = null, saveTime = 0) {
       counter.innerHTML = `Moves: ${count}`;
     }
   }
+  activeCells();
 }
 
 const footer = document.createElement('div');

@@ -166,7 +166,6 @@ body {
 }
 
 .game__cell {
-  cursor: pointer;
   border: solid 1px #fff;
   border-radius: 10px;
   position: absolute;
@@ -181,6 +180,11 @@ body {
   box-shadow: rgba(240, 19, 240, 1) 0px 0px 80px;
   z-index: 1;
 }
+
+.game__cell-active{
+  cursor: pointer;
+}
+
 
 .game__footer {
   display: flex;
