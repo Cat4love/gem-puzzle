@@ -6,9 +6,27 @@ const game = document.createElement('div');
 game.className = 'game';
 container.append(game);
 
+const popup = document.createElement('div');
+popup.className = 'game__popup';
+game.append(popup);
+
+const popupWraper = document.createElement('div');
+popupWraper.className = 'game__popup-wraper';
+popup.append(popupWraper);
+
+const closePopup = document.createElement('p');
+closePopup.innerHTML = '-Close-';
+closePopup.className = 'game__close';
+popup.append(closePopup);
+
 const header = document.createElement('div');
 header.className = 'game__header';
 game.append(header);
+
+const title = document.createElement('h1');
+title.innerHTML = 'Sliding Tile Puzzle';
+title.className = 'game__title';
+header.append(title);
 
 const buttons = document.createElement('div');
 buttons.className = 'game__buttons';
@@ -52,10 +70,12 @@ info.append(counter);
 
 const timer = document.createElement('p');
 timer.className = 'game__timer';
+timer.innerHTML = 'Time: 00:00'
 info.append(timer);
 
 let time = 0;
 let timerInterval;
+let showTimer;
 function startTimer() {
   stopTimer();
   timerInterval = setInterval(function () {
@@ -65,6 +85,7 @@ function startTimer() {
     timer.innerHTML = `Time: ${
       minuteVal < 10 ? '0' + minuteVal.toString() : minuteVal
     }:${secondVal < 10 ? '0' + secondVal.toString() : secondVal}`;
+    showTimer = timer.innerHTML;
   }, 1000 / 60);
 }
 
@@ -72,17 +93,16 @@ function stopTimer() {
   clearInterval(timerInterval);
 }
 
+let resultsArray = [];
+let resultsArrayLength = 0;
 
 let gameSize = 320;
-
 
 const wraper = document.createElement('div');
 wraper.className = 'game__wraper';
 game.append(wraper);
 
 let amount = 4;
-
-
 
 start.addEventListener('click', () => {
   wraper.firstChild.remove();
@@ -93,9 +113,22 @@ start.addEventListener('click', () => {
 
 let cells = [];
 
-function newGame(amount, saveCells = null, timer = 0) {
-  time = timer;
-  startTimer();
+function newGame(amount, saveCells = null, saveTime = 0) {
+  stopTimer()
+
+  time = saveTime;
+
+  if(saveTime === 0){
+    timer.innerHTML = 'Time: 00:00';
+  } else {
+    secondVal = Math.floor(time) - Math.floor(time / 60) * 60;
+    minuteVal = Math.floor(time / 60);
+    timer.innerHTML = `Time: ${
+      minuteVal < 10 ? '0' + minuteVal.toString() : minuteVal
+    }:${secondVal < 10 ? '0' + secondVal.toString() : secondVal}`;
+    showTimer = timer.innerHTML;
+  }
+
   const field = document.createElement('div');
   field.className = 'game__field';
   wraper.append(field);
@@ -104,17 +137,15 @@ function newGame(amount, saveCells = null, timer = 0) {
     () => Math.random() - 0.5
   );
   cells = [];
-  
+
   let empty = {};
 
-  if (saveCells == null){
-    empty.top = 0,
-    empty.left = 0,
-    empty.value = 0
+  if (saveCells == null) {
+    (empty.top = 0), (empty.left = 0), (empty.value = 0);
   } else {
-    empty.top = saveCells[0].top,
-    empty.left = saveCells[0].left,
-    empty.value = saveCells[0].value
+    (empty.top = saveCells[0].top),
+      (empty.left = saveCells[0].left),
+      (empty.value = saveCells[0].value);
   }
 
   cells.push(empty);
@@ -127,7 +158,7 @@ function newGame(amount, saveCells = null, timer = 0) {
     let left = 0;
     let top = 0;
     let value = 0;
-    if (saveCells == null){
+    if (saveCells == null) {
       left = i % amount;
       top = (i - left) / amount;
       cell.innerHTML = numbers[i - 1] + 1;
@@ -135,14 +166,14 @@ function newGame(amount, saveCells = null, timer = 0) {
       cell.style.left = `${left * (gameSize / amount)}px`;
       cell.style.top = `${top * (gameSize / amount)}px`;
     } else {
-      left = saveCells[i].left
-      top = saveCells[i].top
-      cell.innerHTML = saveCells[i].value
-      value = saveCells[i].value
+      left = saveCells[i].left;
+      top = saveCells[i].top;
+      cell.innerHTML = saveCells[i].value;
+      value = saveCells[i].value;
       cell.style.left = `${left * (gameSize / amount)}px`;
       cell.style.top = `${top * (gameSize / amount)}px`;
     }
-  
+
     cells.push({
       value: value,
       left: left,
@@ -157,14 +188,17 @@ function newGame(amount, saveCells = null, timer = 0) {
   }
 
   function move(index) {
-    if(soundFlag){
+
+    startTimer();
+
+    if (soundFlag) {
       getSound();
     }
-    
+
     startTimer();
     const cell = cells[index];
 
-    if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 1) {
+    if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 4) {
       return;
     } else {
       cell.element.style.left = `${empty.left * (gameSize / amount)}px`;
@@ -185,7 +219,7 @@ function newGame(amount, saveCells = null, timer = 0) {
 
     function test() {
       let flag = true;
-      for (let i = 1; i <= (amount ** 2) - 1; i++) {
+      for (let i = 1; i <= amount ** 2 - 1; i++) {
         if (cells[i].value !== cells[i].top * amount + cells[i].left + 1) {
           flag = false;
         }
@@ -194,7 +228,46 @@ function newGame(amount, saveCells = null, timer = 0) {
     }
 
     if (test()) {
-      console.log('you win');
+      popupWraper.innerText = `Hooray! You solved the puzzle in ${showTimer.slice(
+        6
+      )} and ${count} moves!`;
+      popup.classList.add('show__popup');
+      let result = {};
+      resultsArray.push({
+        size: amount,
+        moves: count,
+        time: showTimer.slice(6),
+        score: Math.ceil((Number(amount) / count) * 100000),
+      });
+
+      resultsArray.sort((a, b) => b.score - a.score);
+
+      if (resultsArray.length >= 10) {
+        resultsArray = resultsArray.slice(0, 10);
+      }
+
+      resultsArrayLength = resultsArray.length;
+
+      localStorage.setItem('resultsArrayLength', resultsArrayLength);
+
+      for (let i = 0; i < resultsArray.length; i++) {
+        localStorage.removeItem(
+          (`score: ${i}`, JSON.stringify(resultsArray[i]))
+        );
+      }
+
+      for (let i = 0; i < resultsArray.length; i++) {
+        localStorage.setItem(`score: ${i}`, JSON.stringify(resultsArray[i]));
+      }
+
+      wraper.firstChild.remove();
+
+      newGame(amount, null);
+
+      count = 0;
+      
+      counter.innerHTML = `Moves: ${count}`;
+
     }
   }
 }
@@ -241,60 +314,83 @@ select.addEventListener('change', () => {
   counter.innerHTML = `Moves: ${count}`;
 });
 
-function saveGame(){
-  localStorage.clear()
-  localStorage.setItem('flag', null)
-  for (let i = 0; i < cells.length; i++){
-    localStorage.setItem(i, JSON.stringify(cells[i]))
+function saveGame() {
+  localStorage.clear();
+  localStorage.setItem('flag', null);
+  for (let i = 0; i < cells.length; i++) {
+    localStorage.setItem(`cell: ${i}`, JSON.stringify(cells[i]));
   }
-  localStorage.setItem('amount', amount)
-  localStorage.setItem('count', count)
-  localStorage.setItem('timer', time)
+  localStorage.setItem('amount', amount);
+  localStorage.setItem('count', count);
+  localStorage.setItem('timer', time);
 }
 
-function loadGame(){
-  amount = Number(localStorage.getItem('amount'))
-  let saveCells = []
-    for (let i = 0; i < amount ** 2; i++){
-      saveCells.push(JSON.parse(localStorage.getItem(i)))
+function loadGame() {
+  amount = Number(localStorage.getItem('amount'));
+  let saveCells = [];
+  for (let i = 0; i < amount ** 2; i++) {
+    saveCells.push(JSON.parse(localStorage.getItem(`cell: ${i}`)));
   }
-  saveTimer = Number(localStorage.getItem('timer'))
+  saveTimer = Number(localStorage.getItem('timer'));
   count = Number(localStorage.getItem('count'));
   counter.innerHTML = `Moves: ${count}`;
   for (let i = 0; i < 6; i++) {
-    if(amount == select.childNodes[i].value){
+    if (amount == select.childNodes[i].value) {
       select.childNodes[i].selected = true;
     }
   }
-  if (wraper.childNodes.length !== 0){
+  if (wraper.childNodes.length !== 0) {
     wraper.firstChild.remove();
   }
-  newGame(amount, saveCells, saveTimer)
+  newGame(amount, saveCells, saveTimer);
 }
 
-save.addEventListener('click', ()=>{
-  saveGame()
-})
+save.addEventListener('click', () => {
+  saveGame();
+});
 
-load.addEventListener('click', ()=>{
-  loadGame()
-})
-
-
+load.addEventListener('click', () => {
+  loadGame();
+});
 
 function getSound() {
-  let audio = new Audio(); 
-  audio.src = './assets/audio/stone_touch_effect.mp3'; 
-  audio.autoplay = true; 
+  let audio = new Audio();
+  audio.src = './assets/audio/stone_touch_effect.mp3';
+  audio.autoplay = true;
 }
 
-
-sound.addEventListener('click', ()=>{
-  if(soundFlag){
+sound.addEventListener('click', () => {
+  if (soundFlag) {
     soundFlag = false;
   } else {
     soundFlag = true;
   }
 
-  sound.classList.toggle('sound__off')
-})
+  sound.classList.toggle('sound__off');
+});
+
+results.addEventListener('click', () => {
+  popup.classList.add('show__popup');
+  resultsArray.sort((a, b) => b.score - a.score);
+  for (let i = 0; i < resultsArray.length && i < 10; i++) {
+    popupWraper.innerText += `\n${i + 1}. size: ${
+      resultsArray[i].size
+    },  time: ${resultsArray[i].time},  moves: ${
+      resultsArray[i].moves
+    },  score:  ${resultsArray[i].score}\n`;
+  }
+});
+
+closePopup.addEventListener('click', () => {
+  popup.classList.remove('show__popup');
+  popupWraper.innerText = '';
+});
+
+window.addEventListener('load', () => {
+  resultsArrayLength = Number(localStorage.getItem('resultsArrayLength'));
+  for (let i = 0; i < resultsArrayLength; i++) {
+    resultsArray.push(JSON.parse(localStorage.getItem(`score: ${i}`)));
+
+    resultsArray.sort((a, b) => b.score - a.score);
+  }
+});
