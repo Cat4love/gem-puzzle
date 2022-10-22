@@ -163,10 +163,8 @@ function newGame(amount, saveCells = null, saveTime = 0) {
     let numbers; 
     numbers = generateDigits()
     if (testNumbers(numbers)) {
-      console.log(true)
-      trueNumbers = numbers
+      trueNumbers = numbers;
     } else {
-      console.log(false)
       getNumbers();
     }
     return trueNumbers;
@@ -229,11 +227,7 @@ function newGame(amount, saveCells = null, saveTime = 0) {
 
     cell.addEventListener('dragstart', dragStart);
 
-    cell.addEventListener('dragend', dragEnd);
-  }
-
-  function dragStart(event) {
-    activeCells();
+    field.addEventListener('drop', drop);
   }
 
   function activeCells() {
@@ -251,17 +245,22 @@ function newGame(amount, saveCells = null, saveTime = 0) {
     }
   }
 
-  function dragEnd(event) {
-    startTimer();
+
+  function dragStart(event) {
+    for (let i = 0; i < cells.length; i++) {
+      if (cells[i].value === Number(event.target.innerText)) {
+        event.dataTransfer.setData('cell', i);
+      }
+    }
+  }
+
+  function drop(event) {
+    let i = event.dataTransfer.getData("cell");
+
+    let cell = cells[i]
 
     if (soundFlag) {
       getSound();
-    }
-
-    for (let i = 0; i < cells.length; i++) {
-      if (cells[i].value === Number(event.target.innerText)) {
-        cell = cells[i];
-      }
     }
 
     if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 1) {
@@ -279,8 +278,10 @@ function newGame(amount, saveCells = null, saveTime = 0) {
       cell.left = emptyleft;
       cell.top = emptyTop;
     }
-
+    startTimer();
     activeCells();
+    count += 1;
+    counter.innerHTML = `Moves: ${count}`;
   }
 
   field.addEventListener('dragover', (event) => {
@@ -295,7 +296,7 @@ function newGame(amount, saveCells = null, saveTime = 0) {
       getSound();
     }
 
-    cell = cells[index];
+    let cell = cells[index];
 
     if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 1) {
       return;
