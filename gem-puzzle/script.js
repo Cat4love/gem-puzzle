@@ -468,7 +468,7 @@ function loadGame() {
 
 function getSound() {
   let audio = new Audio();
-  audio.src = '../../assets/audio/stone_touch_effect.mp3';
+  audio.src = 'assets/audio/stone_touch_effect.mp3';
   audio.autoplay = true;
 }
 
