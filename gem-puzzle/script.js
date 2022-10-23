@@ -1,3 +1,4 @@
+// create elements
 const container = document.createElement('div');
 container.className = 'container';
 document.body.append(container);
@@ -18,7 +19,6 @@ const closePopup = document.createElement('p');
 closePopup.innerHTML = '-Close-';
 closePopup.className = 'game__close';
 popup.append(closePopup);
-
 
 const title = document.createElement('h1');
 title.innerHTML = 'Sliding Tile Puzzle';
@@ -70,9 +70,118 @@ timer.className = 'game__timer';
 timer.innerHTML = 'Time: 00:00';
 info.append(timer);
 
+const wraper = document.createElement('div');
+wraper.className = 'game__wraper';
+game.append(wraper);
+
+const size = document.createElement('div');
+size.className = 'game__size';
+game.append(size);
+
+const label = document.createElement('label');
+label.className = 'game__label';
+label.innerText = 'Frame size:';
+size.append(label);
+
+const select = document.createElement('select');
+select.className = 'game__select';
+size.append(select);
+
+for (let i = 0; i < 6; i++) {
+  let fieldSize = [
+    ['3x3', 3],
+    ['4x4', 4],
+    ['5x5', 5],
+    ['6x6', 6],
+    ['7x7', 7],
+    ['8x8', 8],
+  ];
+  const option = document.createElement('option');
+  option.className = 'game__option';
+  option.innerHTML = fieldSize[i][0];
+  option.value = fieldSize[i][1];
+  if (i === 1) {
+    option.selected = true;
+  }
+  select.append(option);
+}
+// add global variables
 let time = 0;
 let timerInterval;
 let showTimer;
+let resultsArray = [];
+let resultsArrayLength = 0;
+let gameSize = 310;
+let amount = 4;
+let cells = [];
+
+// add event listeners
+start.addEventListener('click', () => {
+  wraper.firstChild.remove();
+  generateNewGame(amount);
+  count = 0;
+  counter.innerHTML = `Moves: ${count}`;
+});
+
+select.addEventListener('change', () => {
+  amount = select.value;
+  wraper.firstChild.remove();
+  generateNewGame(amount, null);
+  count = 0;
+  counter.innerHTML = `Moves: ${count}`;
+});
+
+save.addEventListener('click', () => {
+  saveGame();
+});
+
+load.addEventListener('click', () => {
+  loadGame();
+});
+
+sound.addEventListener('click', () => {
+  if (soundFlag) {
+    soundFlag = false;
+  } else {
+    soundFlag = true;
+  }
+  sound.classList.toggle('sound__off');
+});
+
+results.addEventListener('click', () => {
+  popup.classList.add('show__popup');
+  resultsArray.sort((a, b) => b.score - a.score);
+  for (let i = 0; i < resultsArray.length && i < 10; i++) {
+    popupWraper.innerText += `\n${i + 1}. size: ${
+      resultsArray[i].size
+    },  time: ${resultsArray[i].time},  moves: ${
+      resultsArray[i].moves
+    },  score:  ${resultsArray[i].score}\n`;
+  }
+});
+
+closePopup.addEventListener('click', () => {
+  popup.classList.remove('show__popup');
+  popupWraper.innerText = '';
+});
+
+container.addEventListener('click', (event) => {
+  if(event.target.className === 'container' &&  popup.classList.contains('show__popup')){
+    popup.classList.remove('show__popup');
+    popupWraper.innerText = '';
+  }
+});
+
+window.addEventListener('load', () => {
+  resultsArrayLength = Number(localStorage.getItem('resultsArrayLength'));
+  for (let i = 0; i < resultsArrayLength; i++) {
+    resultsArray.push(JSON.parse(localStorage.getItem(`score: ${i}`)));
+
+    resultsArray.sort((a, b) => b.score - a.score);
+  }
+});
+
+// add functions
 function startTimer() {
   stopTimer();
   timerInterval = setInterval(function () {
@@ -90,29 +199,7 @@ function stopTimer() {
   clearInterval(timerInterval);
 }
 
-let resultsArray = [];
-let resultsArrayLength = 0;
-
-let gameSize = 310;
-
-const wraper = document.createElement('div');
-wraper.className = 'game__wraper';
-game.append(wraper);
-
-let amount = 4;
-
-start.addEventListener('click', () => {
-  wraper.firstChild.remove();
-  newGame(amount);
-  count = 0;
-  counter.innerHTML = `Moves: ${count}`;
-});
-
-let cells = [];
-
-function newGame(amount, saveCells = null, saveTime = 0) {
-
-
+function generateNewGame(amount, saveCells = null, saveTime = 0) {
   time = saveTime;
 
   stopTimer();
@@ -127,7 +214,6 @@ function newGame(amount, saveCells = null, saveTime = 0) {
     }:${secondVal < 10 ? '0' + secondVal.toString() : secondVal}`;
     showTimer = timer.innerHTML;
   }
-
   const field = document.createElement('div');
   field.className = 'game__field';
   wraper.append(field);
@@ -251,9 +337,7 @@ function newGame(amount, saveCells = null, saveTime = 0) {
 
   function drop(event) {
     let i = event.dataTransfer.getData('cell');
-
     let cell = cells[i];
-
     if (soundFlag) {
       getSound();
     }
@@ -263,13 +347,10 @@ function newGame(amount, saveCells = null, saveTime = 0) {
     } else {
       cell.element.style.left = `${empty.left * (gameSize / amount)}px`;
       cell.element.style.top = `${empty.top * (gameSize / amount)}px`;
-
       const emptyleft = empty.left;
       const emptyTop = empty.top;
-
       empty.left = cell.left;
       empty.top = cell.top;
-
       cell.left = emptyleft;
       cell.top = emptyTop;
     }
@@ -287,25 +368,20 @@ function newGame(amount, saveCells = null, saveTime = 0) {
   });
 
   function move(index) {
-    startTimer()
+    startTimer();
     if (soundFlag) {
       getSound();
     }
-
     let cell = cells[index];
-
     if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 1) {
       return;
     } else {
       cell.element.style.left = `${empty.left * (gameSize / amount)}px`;
       cell.element.style.top = `${empty.top * (gameSize / amount)}px`;
-
       const emptyleft = empty.left;
       const emptyTop = empty.top;
-
       empty.left = cell.left;
       empty.top = cell.top;
-
       cell.left = emptyleft;
       cell.top = emptyTop;
     }
@@ -334,82 +410,30 @@ function newGame(amount, saveCells = null, saveTime = 0) {
         time: showTimer.slice(6),
         score: Math.ceil((Number(amount) / count) * 100000),
       });
-  
       resultsArray.sort((a, b) => b.score - a.score);
-  
       if (resultsArray.length >= 10) {
         resultsArray = resultsArray.slice(0, 10);
       }
-  
       resultsArrayLength = resultsArray.length;
-  
       localStorage.setItem('resultsArrayLength', resultsArrayLength);
-  
       for (let i = 0; i < resultsArray.length; i++) {
         localStorage.removeItem(
           (`score: ${i}`, JSON.stringify(resultsArray[i]))
         );
       }
-  
       for (let i = 0; i < resultsArray.length; i++) {
         localStorage.setItem(`score: ${i}`, JSON.stringify(resultsArray[i]));
       }
-  
       wraper.firstChild.remove();
-  
-      newGame(amount, null);
-  
+      generateNewGame(amount, null);
       count = 0;
-  
       counter.innerHTML = `Moves: ${count}`;
     } else {
-      return
+      return;
     }
   }
   activeCells();
 }
-
-const size = document.createElement('div');
-size.className = 'game__size';
-game.append(size);
-
-const label = document.createElement('label');
-label.className = 'game__label';
-label.innerText = 'Frame size:';
-size.append(label);
-
-const select = document.createElement('select');
-select.className = 'game__select';
-size.append(select);
-
-for (let i = 0; i < 6; i++) {
-  let fieldSize = [
-    ['3x3', 3],
-    ['4x4', 4],
-    ['5x5', 5],
-    ['6x6', 6],
-    ['7x7', 7],
-    ['8x8', 8],
-  ];
-  const option = document.createElement('option');
-  option.className = 'game__option';
-  option.innerHTML = fieldSize[i][0];
-  option.value = fieldSize[i][1];
-  if (i === 1) {
-    option.selected = true;
-  }
-  select.append(option);
-}
-
-newGame(amount);
-
-select.addEventListener('change', () => {
-  amount = select.value;
-  wraper.firstChild.remove();
-  newGame(amount, null);
-  count = 0;
-  counter.innerHTML = `Moves: ${count}`;
-});
 
 function saveGame() {
   localStorage.clear();
@@ -439,55 +463,14 @@ function loadGame() {
   if (wraper.childNodes.length !== 0) {
     wraper.firstChild.remove();
   }
-  newGame(amount, saveCells, saveTimer);
+  generateNewGame(amount, saveCells, saveTimer);
 }
-
-save.addEventListener('click', () => {
-  saveGame();
-});
-
-load.addEventListener('click', () => {
-  loadGame();
-});
 
 function getSound() {
   let audio = new Audio();
-  audio.src = './assets/audio/stone_touch_effect.mp3';
+  audio.src = '../../assets/audio/stone_touch_effect.mp3';
   audio.autoplay = true;
 }
 
-sound.addEventListener('click', () => {
-  if (soundFlag) {
-    soundFlag = false;
-  } else {
-    soundFlag = true;
-  }
-
-  sound.classList.toggle('sound__off');
-});
-
-results.addEventListener('click', () => {
-  popup.classList.add('show__popup');
-  resultsArray.sort((a, b) => b.score - a.score);
-  for (let i = 0; i < resultsArray.length && i < 10; i++) {
-    popupWraper.innerText += `\n${i + 1}. size: ${
-      resultsArray[i].size
-    },  time: ${resultsArray[i].time},  moves: ${
-      resultsArray[i].moves
-    },  score:  ${resultsArray[i].score}\n`;
-  }
-});
-
-closePopup.addEventListener('click', () => {
-  popup.classList.remove('show__popup');
-  popupWraper.innerText = '';
-});
-
-window.addEventListener('load', () => {
-  resultsArrayLength = Number(localStorage.getItem('resultsArrayLength'));
-  for (let i = 0; i < resultsArrayLength; i++) {
-    resultsArray.push(JSON.parse(localStorage.getItem(`score: ${i}`)));
-
-    resultsArray.sort((a, b) => b.score - a.score);
-  }
-});
+// start first game
+generateNewGame(amount);

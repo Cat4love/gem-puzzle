@@ -10,7 +10,7 @@ body {
   font-family: 'Yellowtail', sans-serif;
   color: #fff;
   text-shadow: rgba(240, 19, 240, 1) 0px 0px 20px;
-  background: url(./assets/images/background.png) no-repeat;
+  background: url(../../assets/images/background.png) no-repeat;
   background-size: cover;
   background-position: center;
 }
@@ -183,7 +183,7 @@ body {
   font-size: 30px;
   transition: all 0.5s;
   color: #fff;
-  box-shadow: rgba(240, 19, 240, 1) 0px 0px 40px;
+  box-shadow: rgba(240, 19, 240, 1) 0px 0px 30px;
   z-index: 1;
 }
 
