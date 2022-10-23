@@ -6,10 +6,10 @@ body {
   width: 100vw;
   height: 100%;
   margin: 0px;
-  font-size: 25px;
+  font-size: clamp(20px, 6.25vw, 35px);
   font-family: 'Yellowtail', sans-serif;
   color: #fff;
-  text-shadow: rgba(240, 19, 240, 1) 0px 0px 50px;
+  text-shadow: rgba(240, 19, 240, 1) 0px 0px 20px;
   background: url(./assets/images/background.png) no-repeat;
   background-size: cover;
   background-position: center;
@@ -25,8 +25,13 @@ body {
 }
 
 .game {
-  width: 320px;
-  height: 687px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  gap: 10px;
+  width: clamp(320px, 100vw, 768px);
+  height: 600px;
   position: absolute;
   top: 0;
   right: 0;
@@ -35,19 +40,18 @@ body {
   margin: auto;
 }
 .game__popup {
-  width: 320px;
-  height: 687px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
   margin: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 20px 0px 0px 0px;
   text-align: center;
   background: rgb(177, 43, 215);
   background: linear-gradient(
@@ -57,7 +61,7 @@ body {
   );
   background-size: cover;
   background-position: center;
-  box-shadow: rgba(240, 19, 240, 1) 0px 0px 80px;
+  box-shadow: rgba(240, 19, 240, 1) 0px 0px 310px;
   border-radius: 10px;
   z-index: 0;
   opacity: 0;
@@ -66,13 +70,17 @@ body {
 }
 
 .game__popup-wraper{
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   font-size: 18px;
-  padding: 0px;
+  padding: 0px 5px 0px 5px;
   margin: 0px;
 }
 
 .game__close {
+  font-size: 20px;
   position: absolute;
   right: 0;
   left: 0;
@@ -96,16 +104,9 @@ body {
 }
 
 
-.game__header {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-  margin-top: 40px;
-  margin-bottom: 40px;
-}
 .game__title{
   margin: 0px;
-  font-size: 47px;
+  font-size: clamp(30px, 9.375vw, 60px);
   border-radius: 10px;
   display: flex;
   justify-content: center;
@@ -113,7 +114,9 @@ body {
 
 }
 .game__info {
+  width: 100%;
   display: flex;
+  align-items: center;
   justify-content: space-around;
 }
 
@@ -123,26 +126,30 @@ body {
 }
 
 .game__wraper {
-  width: 100%;
-  margin-bottom: 40px;
+  width: 310px;
+  height: 310px;
 }
 .game__buttons {
+  width: 100%;
   display: flex;
   justify-content: space-around;
   z-index: 1;
 }
 
 .game__button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
   border: 0;
-  padding: 0px;
+ padding: 0px;
   background: transparent;
-  font-size: 25px;
+  font-size: clamp(20px, 6.25vw, 35px);
   font-family: 'Yellowtail', sans-serif;
   color: #fff;
-  text-shadow: rgba(240, 19, 240, 1) 0px 0px 30px;
+  text-shadow: rgba(240, 19, 240, 1) 0px 0px 20px;
   transition: all 0.2s ease-in-out;
 }
 
@@ -157,27 +164,26 @@ body {
 
 
 .game__field {
-  width: 320px;
-  height: 320px;
+  width: 310px;
+  height: 310px;
   border-radius: 10px;
   position: relative;
   margin: 0 auto;
-  box-shadow: rgba(240, 19, 240, 1) 0px 0px 80px;
+  box-shadow: rgba(240, 19, 240, 1) 0px 0px 310px;
 }
 
 .game__cell {
-  border: solid 1px #fff;
+  border: solid 2px #fff;
   border-radius: 10px;
   position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  font-size: 35px;
+  font-size: 30px;
   transition: all 0.5s;
   color: #fff;
-  text-shadow: rgba(240, 19, 240, 1) 0px 0px 50px;
-  box-shadow: rgba(240, 19, 240, 1) 0px 0px 80px;
+  box-shadow: rgba(240, 19, 240, 1) 0px 0px 40px;
   z-index: 1;
 }
 
@@ -195,11 +201,11 @@ body {
 }
 
 .game__select {
-  width: 60px;
+  width: clamp(60px,18.75vw,80px);
   border: 0;
   border-radius: 10px;
   background: transparent;
-  font-size: 25px;
+  font-size: clamp(25px,7.8vw,40px);
   font-family: 'Yellowtail', sans-serif;
   color: #fff;
   text-shadow: rgba(240, 19, 240, 1) 0px 0px 30px;

@@ -19,48 +19,45 @@ closePopup.innerHTML = '-Close-';
 closePopup.className = 'game__close';
 popup.append(closePopup);
 
-const header = document.createElement('div');
-header.className = 'game__header';
-game.append(header);
 
 const title = document.createElement('h1');
 title.innerHTML = 'Sliding Tile Puzzle';
 title.className = 'game__title';
-header.append(title);
+game.append(title);
 
 const buttons = document.createElement('div');
 buttons.className = 'game__buttons';
-header.append(buttons);
+game.append(buttons);
 
 const start = document.createElement('button');
 start.className = 'game__button';
-start.innerHTML = 'Shuffle';
+start.innerHTML = '-Shuffle-';
 buttons.append(start);
 
 const save = document.createElement('button');
 save.className = 'game__button';
-save.innerHTML = 'Save';
+save.innerHTML = '-Save-';
 buttons.append(save);
 
 const load = document.createElement('button');
 load.className = 'game__button';
-load.innerHTML = 'Load';
+load.innerHTML = '-Load-';
 buttons.append(load);
 
 const results = document.createElement('button');
 results.className = 'game__button';
-results.innerHTML = 'Results';
+results.innerHTML = '-Results-';
 buttons.append(results);
 
 const sound = document.createElement('button');
 sound.className = 'game__button';
-sound.innerHTML = 'Sound';
+sound.innerHTML = '-Sound-';
 buttons.append(sound);
 let soundFlag = true;
 
 const info = document.createElement('div');
 info.className = 'game__info';
-header.append(info);
+game.append(info);
 
 let counter = document.createElement('p');
 counter.className = 'game__counter';
@@ -96,7 +93,7 @@ function stopTimer() {
 let resultsArray = [];
 let resultsArrayLength = 0;
 
-let gameSize = 320;
+let gameSize = 310;
 
 const wraper = document.createElement('div');
 wraper.className = 'game__wraper';
@@ -114,9 +111,11 @@ start.addEventListener('click', () => {
 let cells = [];
 
 function newGame(amount, saveCells = null, saveTime = 0) {
-  stopTimer();
+
 
   time = saveTime;
+
+  stopTimer();
 
   if (saveTime === 0) {
     timer.innerHTML = 'Time: 00:00';
@@ -150,18 +149,18 @@ function newGame(amount, saveCells = null, saveTime = 0) {
         }
       }
     }
-    if (amount % 2 !== 0 && count % 2 === 0){
+    if (amount % 2 !== 0 && count % 2 === 0) {
       return true;
-    } else if (amount % 2 === 0 && count % 2 !== 0){
+    } else if (amount % 2 === 0 && count % 2 !== 0) {
       return true;
     } else {
-      return false
+      return false;
     }
   }
 
   function getNumbers() {
-    let numbers; 
-    numbers = generateDigits()
+    let numbers;
+    numbers = generateDigits();
     if (testNumbers(numbers)) {
       trueNumbers = numbers;
     } else {
@@ -170,11 +169,8 @@ function newGame(amount, saveCells = null, saveTime = 0) {
     return trueNumbers;
   }
 
-
-
-  
-
   const numbers = getNumbers();
+
   cells = [];
 
   let empty = {};
@@ -245,7 +241,6 @@ function newGame(amount, saveCells = null, saveTime = 0) {
     }
   }
 
-
   function dragStart(event) {
     for (let i = 0; i < cells.length; i++) {
       if (cells[i].value === Number(event.target.innerText)) {
@@ -255,9 +250,9 @@ function newGame(amount, saveCells = null, saveTime = 0) {
   }
 
   function drop(event) {
-    let i = event.dataTransfer.getData("cell");
+    let i = event.dataTransfer.getData('cell');
 
-    let cell = cells[i]
+    let cell = cells[i];
 
     if (soundFlag) {
       getSound();
@@ -282,6 +277,7 @@ function newGame(amount, saveCells = null, saveTime = 0) {
     activeCells();
     count += 1;
     counter.innerHTML = `Moves: ${count}`;
+    test();
   }
 
   field.addEventListener('dragover', (event) => {
@@ -291,7 +287,7 @@ function newGame(amount, saveCells = null, saveTime = 0) {
   });
 
   function move(index) {
-    startTimer();
+    startTimer()
     if (soundFlag) {
       getSound();
     }
@@ -316,18 +312,17 @@ function newGame(amount, saveCells = null, saveTime = 0) {
     activeCells();
     count += 1;
     counter.innerHTML = `Moves: ${count}`;
+    test();
+  }
 
-    function test() {
-      let flag = true;
-      for (let i = 1; i <= amount ** 2 - 1; i++) {
-        if (cells[i].value !== cells[i].top * amount + cells[i].left + 1) {
-          flag = false;
-        }
+  function test() {
+    let flag = true;
+    for (let i = 1; i <= amount ** 2 - 1; i++) {
+      if (cells[i].value !== cells[i].top * amount + cells[i].left + 1) {
+        flag = false;
       }
-      return flag;
     }
-
-    if (test()) {
+    if (flag) {
       popupWraper.innerText = `Hooray! You solved the puzzle in ${showTimer.slice(
         6
       )} and ${count} moves!`;
@@ -339,51 +334,53 @@ function newGame(amount, saveCells = null, saveTime = 0) {
         time: showTimer.slice(6),
         score: Math.ceil((Number(amount) / count) * 100000),
       });
-
+  
       resultsArray.sort((a, b) => b.score - a.score);
-
+  
       if (resultsArray.length >= 10) {
         resultsArray = resultsArray.slice(0, 10);
       }
-
+  
       resultsArrayLength = resultsArray.length;
-
+  
       localStorage.setItem('resultsArrayLength', resultsArrayLength);
-
+  
       for (let i = 0; i < resultsArray.length; i++) {
         localStorage.removeItem(
           (`score: ${i}`, JSON.stringify(resultsArray[i]))
         );
       }
-
+  
       for (let i = 0; i < resultsArray.length; i++) {
         localStorage.setItem(`score: ${i}`, JSON.stringify(resultsArray[i]));
       }
-
+  
       wraper.firstChild.remove();
-
+  
       newGame(amount, null);
-
+  
       count = 0;
-
+  
       counter.innerHTML = `Moves: ${count}`;
+    } else {
+      return
     }
   }
   activeCells();
 }
 
-const footer = document.createElement('div');
-footer.className = 'game__footer';
-game.append(footer);
+const size = document.createElement('div');
+size.className = 'game__size';
+game.append(size);
 
 const label = document.createElement('label');
 label.className = 'game__label';
 label.innerText = 'Frame size:';
-footer.append(label);
+size.append(label);
 
 const select = document.createElement('select');
 select.className = 'game__select';
-footer.append(select);
+size.append(select);
 
 for (let i = 0; i < 6; i++) {
   let fieldSize = [
