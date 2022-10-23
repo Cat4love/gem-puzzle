@@ -338,10 +338,6 @@ function generateNewGame(amount, saveCells = null, saveTime = 0) {
   function drop(event) {
     let i = event.dataTransfer.getData('cell');
     let cell = cells[i];
-    if (soundFlag) {
-      getSound();
-    }
-
     if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 1) {
       return;
     } else {
@@ -353,6 +349,9 @@ function generateNewGame(amount, saveCells = null, saveTime = 0) {
       empty.top = cell.top;
       cell.left = emptyleft;
       cell.top = emptyTop;
+    }
+    if (soundFlag) {
+      getSound();
     }
     startTimer();
     activeCells();
@@ -369,9 +368,6 @@ function generateNewGame(amount, saveCells = null, saveTime = 0) {
 
   function move(index) {
     startTimer();
-    if (soundFlag) {
-      getSound();
-    }
     let cell = cells[index];
     if (Math.abs(empty.left - cell.left) + Math.abs(empty.top - cell.top) > 1) {
       return;
@@ -384,6 +380,9 @@ function generateNewGame(amount, saveCells = null, saveTime = 0) {
       empty.top = cell.top;
       cell.left = emptyleft;
       cell.top = emptyTop;
+    }
+    if (soundFlag) {
+      getSound();
     }
     activeCells();
     count += 1;
