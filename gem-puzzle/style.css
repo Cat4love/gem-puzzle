@@ -207,7 +207,7 @@ body {
   background: transparent;
   font-size: clamp(25px,7.8vw,40px);
   font-family: 'Yellowtail', sans-serif;
-  color: #fff;
+  color: rgb(240, 19, 240);
   text-shadow: rgba(240, 19, 240, 1) 0px 0px 30px;
 }
 
